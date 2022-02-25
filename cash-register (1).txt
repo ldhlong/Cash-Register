@@ -1,0 +1,70 @@
+
+function checkCashRegister(price, cash, cid) {
+  
+  //creating a variable to more easily call currency amounts. all amounts multiplied by 100 to avoid float errors in javascript mathematics
+  const bills = [["PENNY", 1], ["NICKEL", 5], ["DIME", 10], ["QUARTER", 25], ["ONE", 100], ["FIVE", 500], ["TEN", 1000], ["TWENTY", 2000], ["ONE HUNDRED", 10000]];
+
+  let change = (cash*100)-(price*100);
+  //multiplying by 100 to avoid float errors in javascript mathematics
+  //creating objects to store cash in drawer
+  let cashonhand = {};
+  let cashtogive = {};
+
+ //setting string name (penny, nickle, dime, etc.) equal to dollar/cents amount in drawer (cid) & multiplying by 100 to avoid float errors in javascript mathematics
+  cid.forEach(function(bills){
+cashonhand[bills[0]]=Math.round(bills[1]*100)
+  })
+
+let index=bills.length-1;
+
+  //start counting down within the cid object with while loop
+while (index>=0){
+    let denom = bills[index]
+if (change-denom[1] >0 ){
+    //find out when/if change can actually go into dollar/cents of currency provided
+cashtogive[denom[0]]=0;
+     //ensure we have more cash on hand than we need to give in change and we stop when our change to give is 0
+ while (cashonhand[denom[0]]>0 && change - bills[index][1]>=0){
+      //decreasing the cash on hand and incrementing up the amount to give 
+cashonhand[denom[0]] -= denom[1];
+cashtogive[denom[0]] += denom[1]
+change -= denom[1];
+    }
+  }
+  index-= 1;
+  }
+  //Finally, if change is zero we can give a status update
+  
+  if (change === 0){
+    let closedreg = true;
+  //creating an object and mapping it to the currency unit
+    Object.keys(cashonhand).forEach(currencytype => {
+     if (cashonhand[currencytype]>0){
+       closedreg = false;
+     }
+    });
+
+if (closedreg){
+  //return if register is closed
+return {status: "CLOSED", change:cid}
+  }
+  
+else{
+ let changearr =[];
+ //if register is open
+ //creating an object and mapping it to the currency unit
+   Object.keys(cashtogive).map(function(currencytype){
+     if(cashtogive[currencytype]>0){
+    changearr.push([currencytype, cashtogive[currencytype] / 100])
+          };
+   });
+//return the status and change
+return {status: "OPEN", change:changearr};
+  }
+}
+ //return insufficient funds
+return {status: "INSUFFICIENT_FUNDS", change:[]}
+ 
+}
+
+checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
